@@ -11,7 +11,9 @@
     "Unity.Entities.Hybrid",
     "com.bovinelabs.grid",
     "FireAlt.BLinq",
-    "BovineLabs.Quill.Grid.Data"
+    "BovineLabs.Quill.Grid.Data",
+    "Unity.Burst",
+    "Unity.Transforms"
   ],
   "includePlatforms": [
     "Editor"

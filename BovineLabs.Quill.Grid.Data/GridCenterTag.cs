@@ -38,4 +38,3 @@ public struct GridCellVisualState : IBufferElementData
     public float4 TargetColor;
     public float4 CurrentColor;
 }
-
