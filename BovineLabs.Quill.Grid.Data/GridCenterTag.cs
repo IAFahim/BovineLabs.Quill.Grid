@@ -11,18 +11,26 @@ public struct GridVisualizerConfig : IComponentData
     public int2 Size;
     public float3 BlockSize;
     public float Spacing;
+    public float BaseHeight;
 
     public float HoverRadius;
     public float HoverDepth;
-    public float4 DefaultColor;
-    public float4 HoverColor;
+        
+    public float4 BaseColor;
+    public float4 OutlineColor;
+    public float4 HoverColorCore;
+    public float4 HoverColorOuter;
 
     public float TransitionSpeed;
 
     public bool RevealEnabled;
-    public float RevealYOffset;
-    public float4 RevealTextColor;
-    public float RevealTextSize;
+    public float ScanPlaneYOffset;
+    public float HeatmapYOffset;
+    public float4 PlaneColor;
+        
+    public float4 HeatmapCold;
+    public float4 HeatmapHot;
+    public float TextSize;
 }
 
 public struct GridVisualizerInput : IComponentData
@@ -38,3 +46,4 @@ public struct GridCellVisualState : IBufferElementData
     public float4 TargetColor;
     public float4 CurrentColor;
 }
+
