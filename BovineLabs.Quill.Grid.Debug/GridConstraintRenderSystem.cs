@@ -1,48 +1,49 @@
-#if (UNITY_EDITOR || BL_DEBUG) && BL_GRID_CBS
+using BovineLabs.Core;
+using BovineLabs.Quill.Grid.Data;
+using Unity.Burst;
+using Unity.Entities;
+using Unity.Mathematics;
+
 namespace BovineLabs.Quill.Grid.Debug
 {
-    using BovineLabs.Quill;
-    using BovineLabs.Core;
-    using BovineLabs.Quill.Grid.Data;
-    using Unity.Burst;
-    using Unity.Collections;
-    using Unity.Entities;
-    using Unity.Mathematics;
-    using UnityEngine;
-
-    [WorldSystemFilter(WorldSystemFilterFlags.LocalSimulation | WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ServerSimulation | WorldSystemFilterFlags.Editor)]
+    [WorldSystemFilter(WorldSystemFilterFlags.LocalSimulation | WorldSystemFilterFlags.ClientSimulation |
+                       WorldSystemFilterFlags.ServerSimulation | WorldSystemFilterFlags.Editor)]
     [UpdateInGroup(typeof(DebugSystemGroup))]
-    public unsafe partial struct GridConstraintRenderSystem : ISystem
+    public partial struct GridConstraintRenderSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GridVisualizerSingleton>();
+            state.RequireForUpdate<GridVisualizerData>();
             state.RequireForUpdate<DrawSystem.Singleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var singleton = SystemAPI.GetSingleton<GridVisualizerSingleton>();
-            if (!singleton.Enabled) return;
-
             var drawer =
- SystemAPI.GetSingleton<DrawSystem.Singleton>().CreateDrawer<GridConstraintRenderSystem>("Grid/Constraints");
+                SystemAPI.GetSingleton<DrawSystem.Singleton>()
+                    .CreateDrawer<GridConstraintRenderSystem>("Grid/Constraints");
             if (!drawer.IsEnabled) return;
 
-            var converter =
- new GridCoordinateConverter(singleton.Origin, singleton.CellSize, singleton.GridWidth, singleton.GridHeight);
-
-            foreach (var (constraints, config) in
-                     SystemAPI.Query<DynamicBuffer<GridConstraintVisual>, GridAlgorithmVisualConfig>())
+            foreach (var (visualizer, global, config, constraints) in
+                     SystemAPI.Query<GridVisualizerData, GridVisualizerGlobal, GridAlgorithmVisualConfig,
+                         DynamicBuffer<GridConstraintVisual>>())
             {
+                if (!global.Enabled) continue;
                 if (!config.DrawConstraints) continue;
 
+                var converter =
+                    new GridCoordinateConverter(visualizer.Origin, visualizer.CellSize, visualizer.GridWidth,
+                        visualizer.GridHeight);
+
                 var array = constraints.AsNativeArray();
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
                     var c = array[i];
+                    if (config.DrawTimeline && c.Time > global.CurrentFrame) continue;
+                    if (global.Mode == GridVisualizerMode.Step && c.Time > global.CurrentFrame) continue;
+
                     var center = converter.CellCenter(c.Cell);
                     center.y += 0.08f;
 
@@ -50,13 +51,12 @@ namespace BovineLabs.Quill.Grid.Debug
                     color.a = 0.5f;
                     var size = new float3(converter.CellSize * 0.9f, 0.03f, converter.CellSize * 0.9f);
 
-                    drawer.Cuboid(center, quaternion.identity, size, color, 0f);
+                    drawer.Cuboid(center, quaternion.identity, size, color);
 
                     center.y += 0.15f;
-                    drawer.Point(center, 2f, GridPalette.Constraint, 0f);
+                    drawer.Point(center, 2f, GridPalette.Constraint);
                 }
             }
         }
     }
 }
-#endif

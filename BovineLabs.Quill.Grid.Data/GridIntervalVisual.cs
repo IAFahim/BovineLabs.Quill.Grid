@@ -1,10 +1,11 @@
-#if BL_GRID_ANYA
+using Unity.Entities;
 using Unity.Mathematics;
 
 namespace BovineLabs.Quill.Grid.Data
 {
     public struct GridIntervalVisual : IBufferElementData
     {
+        public int Frame;
         public int Y;
         public float XL;
         public float XR;
@@ -13,8 +14,10 @@ namespace BovineLabs.Quill.Grid.Data
         public int ParentIndex;
         public bool IsExpanded;
 
-        public GridIntervalVisual(int y, float xl, float xr, float2 root, float cost, int parentIndex, bool isExpanded)
+        public GridIntervalVisual(int y, float xl, float xr, float2 root, float cost, int parentIndex, bool isExpanded,
+            int frame = 0)
         {
+            Frame = frame;
             Y = y;
             XL = xl;
             XR = xr;
@@ -25,4 +28,3 @@ namespace BovineLabs.Quill.Grid.Data
         }
     }
 }
-#endif

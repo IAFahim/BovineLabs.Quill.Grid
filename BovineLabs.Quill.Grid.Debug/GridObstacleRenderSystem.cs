@@ -15,27 +15,26 @@ namespace BovineLabs.Quill.Grid.Debug
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GridVisualizerSingleton>();
+            state.RequireForUpdate<GridVisualizerData>();
             state.RequireForUpdate<DrawSystem.Singleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var singleton = SystemAPI.GetSingleton<GridVisualizerSingleton>();
-            if (!singleton.Enabled) return;
-
             var drawer = SystemAPI.GetSingleton<DrawSystem.Singleton>()
                 .CreateDrawer<GridObstacleRenderSystem>("Grid/Obstacles");
             if (!drawer.IsEnabled) return;
 
-            var converter = new GridCoordinateConverter(singleton.Origin, singleton.CellSize, singleton.GridWidth,
-                singleton.GridHeight);
-
-            foreach (var (blocked, config) in
-                     SystemAPI.Query<DynamicBuffer<GridBlockedData>, GridAlgorithmVisualConfig>())
+            foreach (var (visualizer, global, config, blocked) in
+                     SystemAPI.Query<GridVisualizerData, GridVisualizerGlobal, GridAlgorithmVisualConfig,
+                         DynamicBuffer<GridBlockedData>>())
             {
+                if (!global.Enabled) continue;
                 if (!config.DrawObstacles) continue;
+
+                var converter = new GridCoordinateConverter(visualizer.Origin, visualizer.CellSize,
+                    visualizer.GridWidth, visualizer.GridHeight);
 
                 var array = blocked.AsNativeArray();
                 var size = new float3(converter.CellSize * 0.98f, 0.1f, converter.CellSize * 0.98f);

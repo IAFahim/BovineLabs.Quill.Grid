@@ -14,31 +14,33 @@ namespace BovineLabs.Quill.Grid.Debug
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GridVisualizerSingleton>();
+            state.RequireForUpdate<GridVisualizerData>();
             state.RequireForUpdate<DrawSystem.Singleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var singleton = SystemAPI.GetSingleton<GridVisualizerSingleton>();
-            if (!singleton.Enabled) return;
-
             var drawer = SystemAPI.GetSingleton<DrawSystem.Singleton>().CreateDrawer<GridPathRenderSystem>("Grid/Path");
             if (!drawer.IsEnabled) return;
 
-            var converter = new GridCoordinateConverter(singleton.Origin, singleton.CellSize, singleton.GridWidth,
-                singleton.GridHeight);
-
-            foreach (var (segments, config) in
-                     SystemAPI.Query<DynamicBuffer<GridPathVisual>, GridAlgorithmVisualConfig>())
+            foreach (var (visualizer, global, config, segments) in
+                     SystemAPI.Query<GridVisualizerData, GridVisualizerGlobal, GridAlgorithmVisualConfig,
+                         DynamicBuffer<GridPathVisual>>())
             {
+                if (!global.Enabled) continue;
                 if (!config.DrawPath) continue;
+
+                var converter = new GridCoordinateConverter(visualizer.Origin, visualizer.CellSize,
+                    visualizer.GridWidth, visualizer.GridHeight);
 
                 var array = segments.AsNativeArray();
                 for (var i = 0; i < array.Length; i++)
                 {
                     var seg = array[i];
+                    if (global.Mode == GridVisualizerMode.Step && seg.Frame > global.CurrentFrame) continue;
+                    if (config.DrawTimeline && seg.Frame != global.CurrentFrame) continue;
+
                     var from = converter.CellCenter(seg.From.x, seg.From.y);
                     var to = converter.CellCenter(seg.To.x, seg.To.y);
                     from.y += 0.2f;

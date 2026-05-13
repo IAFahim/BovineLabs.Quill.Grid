@@ -48,6 +48,14 @@ namespace BovineLabs.Quill.Grid.Data
                 Origin.z + (y + 1) * CellSize);
         }
 
+        public float3 GridPoint(float x, float y, float height = 0f)
+        {
+            return new float3(
+                Origin.x + x * CellSize,
+                Origin.y + height,
+                Origin.z + y * CellSize);
+        }
+
         public float3 GridMin => Origin;
         public float3 GridMax => new(Origin.x + Width * CellSize, Origin.y, Origin.z + Height * CellSize);
     }

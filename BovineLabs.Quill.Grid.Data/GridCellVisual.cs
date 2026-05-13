@@ -7,6 +7,7 @@ namespace BovineLabs.Quill.Grid.Data
         public int Cell;
         public float Value;
         public byte Layer;
+        public int Frame;
 
         public const byte LayerObstacle = 0;
         public const byte LayerFrontier = 1;
@@ -16,11 +17,12 @@ namespace BovineLabs.Quill.Grid.Data
         public const byte LayerConflict = 5;
         public const byte LayerConstraint = 6;
 
-        public GridCellVisual(int cell, float value, byte layer)
+        public GridCellVisual(int cell, float value, byte layer, int frame = 0)
         {
             Cell = cell;
             Value = value;
             Layer = layer;
+            Frame = frame;
         }
     }
 }

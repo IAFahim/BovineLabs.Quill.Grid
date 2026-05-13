@@ -15,35 +15,34 @@ namespace BovineLabs.Quill.Grid.Debug
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GridVisualizerSingleton>();
+            state.RequireForUpdate<GridVisualizerData>();
             state.RequireForUpdate<DrawSystem.Singleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var singleton = SystemAPI.GetSingleton<GridVisualizerSingleton>();
-            if (!singleton.Enabled) return;
-
             var drawer = SystemAPI.GetSingleton<DrawSystem.Singleton>()
                 .CreateDrawer<GridOutlineRenderSystem>("Grid/Outline");
             if (!drawer.IsEnabled) return;
 
-            var converter = new GridCoordinateConverter(singleton.Origin, singleton.CellSize, singleton.GridWidth,
-                singleton.GridHeight);
-
-
-            var min = converter.GridMin;
-            var max = converter.GridMax;
-            var y = min.y + 0.01f;
-
-            drawer.Line(new float3(min.x, y, min.z), new float3(max.x, y, min.z), GridPalette.GridBorder);
-            drawer.Line(new float3(max.x, y, min.z), new float3(max.x, y, max.z), GridPalette.GridBorder);
-            drawer.Line(new float3(max.x, y, max.z), new float3(min.x, y, max.z), GridPalette.GridBorder);
-            drawer.Line(new float3(min.x, y, max.z), new float3(min.x, y, min.z), GridPalette.GridBorder);
-
-            foreach (var config in SystemAPI.Query<GridAlgorithmVisualConfig>())
+            foreach (var (visualizer, global, config) in
+                     SystemAPI.Query<GridVisualizerData, GridVisualizerGlobal, GridAlgorithmVisualConfig>())
             {
+                if (!global.Enabled) continue;
+
+                var converter = new GridCoordinateConverter(visualizer.Origin, visualizer.CellSize,
+                    visualizer.GridWidth, visualizer.GridHeight);
+
+                var min = converter.GridMin;
+                var max = converter.GridMax;
+                var y = min.y + 0.01f;
+
+                drawer.Line(new float3(min.x, y, min.z), new float3(max.x, y, min.z), GridPalette.GridBorder);
+                drawer.Line(new float3(max.x, y, min.z), new float3(max.x, y, max.z), GridPalette.GridBorder);
+                drawer.Line(new float3(max.x, y, max.z), new float3(min.x, y, max.z), GridPalette.GridBorder);
+                drawer.Line(new float3(min.x, y, max.z), new float3(min.x, y, min.z), GridPalette.GridBorder);
+
                 if (!config.DrawGrid) continue;
 
                 for (var x = 0; x <= converter.Width; x++)
@@ -57,8 +56,6 @@ namespace BovineLabs.Quill.Grid.Debug
                     var z0 = min.z + z * converter.CellSize;
                     drawer.Line(new float3(min.x, y, z0), new float3(max.x, y, z0), GridPalette.GridLine);
                 }
-
-                break;
             }
         }
     }

@@ -38,15 +38,19 @@ namespace BovineLabs.Quill.Grid.Authoring
         {
             var entity = GetEntity(TransformUsageFlags.None);
 
-            AddComponent(entity, new GridVisualizerSingleton
+            AddComponent(entity, new GridVisualizerGlobal
             {
                 Enabled = authoring.enabledByDefault,
+                Mode = GridVisualizerMode.Live,
+                MaxFrames = 256
+            });
+
+            AddComponent(entity, new GridVisualizerData
+            {
                 CellSize = authoring.cellSize,
                 GridWidth = authoring.gridWidth,
                 GridHeight = authoring.gridHeight,
-                Origin = authoring.origin,
-                Mode = GridVisualizerMode.Live,
-                MaxFrames = 256
+                Origin = authoring.origin
             });
 
             AddComponent(entity, new GridAlgorithmVisualConfig
@@ -71,21 +75,13 @@ namespace BovineLabs.Quill.Grid.Authoring
             AddBuffer<GridCellVisual>(entity);
             AddBuffer<GridLineVisual>(entity);
             AddBuffer<GridTextVisual>(entity);
-#if BL_GRID_ANYA
             AddBuffer<GridIntervalVisual>(entity);
-#endif
-#if BL_GRID_BELIEF
             AddBuffer<GridArrowVisual>(entity);
-#endif
             AddBuffer<GridPathVisual>(entity);
-#if BL_GRID_CBS
             AddBuffer<GridAgentPathVisual>(entity);
             AddBuffer<GridConflictVisual>(entity);
             AddBuffer<GridConstraintVisual>(entity);
-#endif
-#if BL_GRID_FASTMARCHING || BL_GRID_EDT
             AddBuffer<GridVectorFieldVisual>(entity);
-#endif
             AddBuffer<GridBlockedData>(entity);
         }
     }

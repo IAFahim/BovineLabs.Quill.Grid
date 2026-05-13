@@ -10,14 +10,18 @@ namespace BovineLabs.Quill.Grid.Data
         Snapshot
     }
 
-    public struct GridVisualizerSingleton : IComponentData
+    public struct GridVisualizerGlobal : IComponentData
     {
         public bool Enabled;
         public int CurrentFrame;
         public int MaxFrames;
+        public GridVisualizerMode Mode;
+    }
+
+    public struct GridVisualizerData : IComponentData
+    {
         public float CellSize;
         public float3 Origin;
-        public GridVisualizerMode Mode;
         public int GridWidth;
         public int GridHeight;
     }

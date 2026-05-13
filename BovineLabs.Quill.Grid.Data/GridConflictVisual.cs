@@ -1,5 +1,4 @@
-#if BL_GRID_CBS
-using Unity.Mathematics;
+using Unity.Entities;
 
 namespace BovineLabs.Quill.Grid.Data
 {
@@ -19,4 +18,3 @@ namespace BovineLabs.Quill.Grid.Data
         }
     }
 }
-#endif
