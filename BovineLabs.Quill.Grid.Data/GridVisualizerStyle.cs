@@ -1,16 +1,19 @@
 using Unity.Entities;
 
-public struct GridVisualizerStyle : IComponentData
+namespace BovineLabs.Quill.Grid.Data
 {
-    public GridVisualStyleType Type;
-}
+    public struct GridVisualizerStyle : IComponentData
+    {
+        public GridVisualStyleType Type;
+    }
 
-public enum GridVisualStyleType : byte
-{
-    Flat,
-    Pillar,
-    HeatmapPlane,
-    ScanReveal,
-    FlowField,
-    CombatThreat
+    public enum GridVisualStyleType : byte
+    {
+        Flat,
+        Pillar,
+        HeatmapPlane,
+        ScanReveal,
+        FlowField,
+        CombatThreat
+    }
 }
