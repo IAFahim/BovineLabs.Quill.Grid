@@ -41,51 +41,30 @@ namespace BovineLabs.Quill.Grid.Debug
                 for (var i = 0; i < array.Length; i++)
                 {
                     var curr = array[i];
-                    var prevIndex = FindStep(array, curr.AgentIndex, curr.TimeStep - 1);
-                    if (prevIndex < 0) continue;
-
-                    var prev = array[prevIndex];
-
                     if (global.Mode == GridVisualizerMode.Step && curr.TimeStep > global.CurrentFrame) continue;
+
+                    var color = GridPalette.AgentColor(curr.AgentIndex);
+                    if (config.DrawTimeline && curr.TimeStep != global.CurrentFrame)
+                        color.a = 0.25f;
+
+                    var pos = converter.CellCenter(curr.Cell);
+                    pos.y += 0.25f;
+                    drawer.Point(pos, 3f, color);
+
+                    if (i == 0) continue;
+
+                    var prev = array[i - 1];
+                    if (prev.AgentIndex != curr.AgentIndex || prev.TimeStep + 1 != curr.TimeStep)
+                        continue;
 
                     var from = converter.CellCenter(prev.Cell);
                     var to = converter.CellCenter(curr.Cell);
                     from.y += 0.25f;
                     to.y += 0.25f;
 
-                    var color = GridPalette.AgentColor(curr.AgentIndex);
-                    if (config.DrawTimeline && curr.TimeStep != global.CurrentFrame)
-                        color.a = 0.25f;
-
                     drawer.Line(from, to, color);
                 }
-
-                for (var i = 0; i < array.Length; i++)
-                {
-                    var a = array[i];
-                    if (global.Mode == GridVisualizerMode.Step && a.TimeStep > global.CurrentFrame) continue;
-
-                    var pos = converter.CellCenter(a.Cell);
-                    pos.y += 0.25f;
-                    var color = GridPalette.AgentColor(a.AgentIndex);
-                    if (config.DrawTimeline && a.TimeStep != global.CurrentFrame)
-                        color.a = 0.35f;
-
-                    drawer.Point(pos, 3f, color);
-                }
             }
-        }
-
-        private static int FindStep(NativeArray<GridAgentPathVisual> array, int agentIndex, int timeStep)
-        {
-            for (var i = 0; i < array.Length; i++)
-            {
-                var path = array[i];
-                if (path.AgentIndex == agentIndex && path.TimeStep == timeStep)
-                    return i;
-            }
-
-            return -1;
         }
     }
 }

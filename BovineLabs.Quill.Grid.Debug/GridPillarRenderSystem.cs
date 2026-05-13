@@ -22,6 +22,7 @@ namespace BovineLabs.Quill.Grid.Debug
             state.RequireForUpdate<DrawSystem.Singleton>();
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var drawer = SystemAPI.GetSingleton<DrawSystem.Singleton>()

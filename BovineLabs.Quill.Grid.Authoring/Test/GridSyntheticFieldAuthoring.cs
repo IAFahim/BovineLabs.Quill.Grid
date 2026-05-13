@@ -1,5 +1,5 @@
+using BovineLabs.Core.Authoring.EntityCommands;
 using BovineLabs.Quill.Grid.Data;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -90,54 +90,14 @@ namespace BovineLabs.Quill.Grid.Authoring.Test
         public override void Bake(GridSyntheticFieldAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
+            var commands = new BakerCommands(this, entity);
             var visualizerAuthoring = authoring.GetComponent<GridVisualizerAuthoring>();
             var hasEnabledVisualizerAuthoring = visualizerAuthoring != null && visualizerAuthoring.enabled;
 
             if (!hasEnabledVisualizerAuthoring)
             {
-                AddComponent(entity, new GridVisualizerGlobal
-                {
-                    Enabled = authoring.enabledByDefault,
-                    Mode = GridVisualizerMode.Live,
-                    CurrentFrame = 0,
-                    MaxFrames = 1
-                });
-
-                AddComponent(entity, new GridVisualizerData
-                {
-                    CellSize = authoring.cellSize,
-                    GridWidth = authoring.gridWidth,
-                    GridHeight = authoring.gridHeight,
-                    Origin = authoring.origin
-                });
-
-                AddComponent(entity, new GridAlgorithmVisualConfig
-                {
-                    AlgorithmName = new FixedString64Bytes(authoring.algorithmName),
-                    Category = new FixedString32Bytes(authoring.category),
-
-                    DrawGrid = authoring.drawGrid,
-                    DrawHeatmap = authoring.drawHeatmap,
-                    DrawVectorField = authoring.drawVectorField,
-                    DrawLabels = authoring.drawLabels,
-                    DrawPath = authoring.drawPath,
-                    DrawObstacles = authoring.drawObstacles,
-
-                    DrawFrontier = false,
-                    DrawClosed = false,
-                    DrawIntervals = false,
-                    DrawConstraints = false,
-                    DrawConflicts = false,
-                    DrawMessages = false,
-                    DrawTimeline = false
-                });
-
-                AddBuffer<GridCellVisual>(entity);
-                AddBuffer<GridVectorFieldVisual>(entity);
-                AddBuffer<GridTextVisual>(entity);
-                AddBuffer<GridLineVisual>(entity);
-                AddBuffer<GridPathVisual>(entity);
-                AddBuffer<GridBlockedData>(entity);
+                var builder = GridSyntheticFieldAuthoringBuilderExtensions.FromAuthoring(authoring);
+                builder.ApplyTo(ref commands);
             }
 
             AddComponent(entity, new GridSyntheticFieldConfig

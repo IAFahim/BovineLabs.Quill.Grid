@@ -41,7 +41,7 @@ namespace BovineLabs.Quill.Grid.Debug
                 for (var i = 0; i < array.Length; i++)
                 {
                     var c = array[i];
-                    if (config.DrawTimeline && c.Time > global.CurrentFrame) continue;
+                    if (config.DrawTimeline && c.Time != global.CurrentFrame) continue;
                     if (global.Mode == GridVisualizerMode.Step && c.Time > global.CurrentFrame) continue;
 
                     var center = converter.CellCenter(c.Cell);

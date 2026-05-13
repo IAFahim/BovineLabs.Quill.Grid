@@ -41,8 +41,8 @@ namespace BovineLabs.Quill.Grid.Debug
                     if (global.Mode == GridVisualizerMode.Step && seg.Frame > global.CurrentFrame) continue;
                     if (config.DrawTimeline && seg.Frame != global.CurrentFrame) continue;
 
-                    var from = converter.CellCenter(seg.From.x, seg.From.y);
-                    var to = converter.CellCenter(seg.To.x, seg.To.y);
+                    var from = converter.CellCenter(seg.From);
+                    var to = converter.CellCenter(seg.To);
                     from.y += 0.2f;
                     to.y += 0.2f;
 

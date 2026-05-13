@@ -98,7 +98,13 @@ namespace BovineLabs.Quill.Grid.Debug
                     var color = math.lerp(pillar.ColdColor, pillar.HotColor, value);
 
                     var s = states[cell.Cell];
-                    s.TargetDepth = value * pillar.MaxDepth;
+                    var targetDepth = value * pillar.MaxDepth;
+                    if (targetDepth < s.TargetDepth)
+                    {
+                        continue;
+                    }
+
+                    s.TargetDepth = targetDepth;
                     s.TargetColor = color;
                     states[cell.Cell] = s;
                 }

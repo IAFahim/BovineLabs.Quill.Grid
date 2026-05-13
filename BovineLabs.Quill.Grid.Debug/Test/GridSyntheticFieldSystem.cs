@@ -14,6 +14,7 @@ namespace BovineLabs.Quill.Grid.Debug
     [UpdateInGroup(typeof(DebugSystemGroup))]
     public partial struct GridSyntheticFieldSystem : ISystem
     {
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GridSyntheticFieldConfig>();
@@ -46,6 +47,12 @@ namespace BovineLabs.Quill.Grid.Debug
                 var width = visualizer.GridWidth;
                 var height = visualizer.GridHeight;
                 var length = width * height;
+                var converter = new GridCoordinateConverter(
+                    visualizer.Origin,
+                    visualizer.CellSize,
+                    visualizer.GridWidth,
+                    visualizer.GridHeight);
+                var labelStride = math.max(1, width / 4);
 
                 for (var index = 0; index < length; index++)
                 {
@@ -72,13 +79,9 @@ namespace BovineLabs.Quill.Grid.Debug
                             math.saturate(value)));
                     }
 
-                    if (config.WriteLabels && index % 8 == 0)
+                    if (config.WriteLabels && cell.x % labelStride == 0 && cell.y % labelStride == 0)
                     {
-                        var world = new GridCoordinateConverter(
-                            visualizer.Origin,
-                            visualizer.CellSize,
-                            visualizer.GridWidth,
-                            visualizer.GridHeight).CellCenter(index);
+                        var world = converter.CellCenter(index);
 
                         world.y += 0.4f;
 

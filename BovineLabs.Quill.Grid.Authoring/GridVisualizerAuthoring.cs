@@ -1,5 +1,4 @@
-using BovineLabs.Quill.Grid.Data;
-using Unity.Collections;
+using BovineLabs.Core.Authoring.EntityCommands;
 using Unity.Entities;
 using UnityEngine;
 
@@ -37,52 +36,9 @@ namespace BovineLabs.Quill.Grid.Authoring
         public override void Bake(GridVisualizerAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
-
-            AddComponent(entity, new GridVisualizerGlobal
-            {
-                Enabled = authoring.enabledByDefault,
-                Mode = GridVisualizerMode.Live,
-                MaxFrames = 256
-            });
-
-            AddComponent(entity, new GridVisualizerData
-            {
-                CellSize = authoring.cellSize,
-                GridWidth = authoring.gridWidth,
-                GridHeight = authoring.gridHeight,
-                Origin = authoring.origin
-            });
-
-            AddComponent(entity, new GridAlgorithmVisualConfig
-            {
-                AlgorithmName = new FixedString64Bytes(authoring.algorithmName),
-                Category = new FixedString32Bytes(authoring.category),
-                DrawGrid = authoring.drawGrid,
-                DrawObstacles = authoring.drawObstacles,
-                DrawFrontier = authoring.drawFrontier,
-                DrawClosed = authoring.drawClosed,
-                DrawPath = authoring.drawPath,
-                DrawLabels = authoring.drawLabels,
-                DrawHeatmap = authoring.drawHeatmap,
-                DrawIntervals = authoring.drawIntervals,
-                DrawConstraints = authoring.drawConstraints,
-                DrawConflicts = authoring.drawConflicts,
-                DrawMessages = authoring.drawMessages,
-                DrawVectorField = authoring.drawVectorField,
-                DrawTimeline = authoring.drawTimeline
-            });
-
-            AddBuffer<GridCellVisual>(entity);
-            AddBuffer<GridLineVisual>(entity);
-            AddBuffer<GridTextVisual>(entity);
-            AddBuffer<GridIntervalVisual>(entity);
-            AddBuffer<GridArrowVisual>(entity);
-            AddBuffer<GridPathVisual>(entity);
-            AddBuffer<GridAgentPathVisual>(entity);
-            AddBuffer<GridConflictVisual>(entity);
-            AddBuffer<GridConstraintVisual>(entity);
-            AddBuffer<GridVectorFieldVisual>(entity);
-            AddBuffer<GridBlockedData>(entity);
+            var commands = new BakerCommands(this, entity);
+            var builder = GridVisualizerAuthoringBuilderExtensions.FromAuthoring(authoring);
+            builder.ApplyTo(ref commands);
         }
     }
 }

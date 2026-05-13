@@ -1,15 +1,13 @@
 using Unity.Entities;
-using Unity.Mathematics;
-
 namespace BovineLabs.Quill.Grid.Data
 {
     public struct GridPathVisual : IBufferElementData
     {
-        public int2 From;
-        public int2 To;
+        public int From;
+        public int To;
         public int Frame;
 
-        public GridPathVisual(int2 from, int2 to, int frame = 0)
+        public GridPathVisual(int from, int to, int frame = 0)
         {
             From = from;
             To = to;
